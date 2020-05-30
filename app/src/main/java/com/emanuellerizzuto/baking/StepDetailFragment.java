@@ -176,7 +176,6 @@ public class StepDetailFragment extends Fragment
     public void onResume() {
         super.onResume();
         ActionBar actionBar = ((RecipeActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle("First Fragment");
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
     }
