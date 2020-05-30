@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -12,8 +13,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,7 +40,8 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener {
+public class StepDetailFragment extends Fragment
+        implements ExoPlayer.EventListener {
 
     private RecipeStepParcelable step;
     private SimpleExoPlayer mExoPlayer;
@@ -69,9 +73,14 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         }
 
         mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
-
-        Uri uri = Uri.parse(step.getVideoURL());
-        initializePlayer(context, uri);
+        String videoURL = step.getVideoURL();
+        if (videoURL.isEmpty()) {
+            mPlayerView.setVisibility(View.GONE);
+        } else {
+            mPlayerView.setVisibility(View.VISIBLE);
+            Uri uri = Uri.parse(videoURL);
+            initializePlayer(context, uri);
+        }
         return view;
     }
 
@@ -161,5 +170,30 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mExoPlayer = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ActionBar actionBar = ((RecipeActivity) getActivity()).getSupportActionBar();
+        actionBar.setTitle("First Fragment");
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.emanuellerizzuto.baking.data.RecipeParcelable;
@@ -40,6 +41,10 @@ public class RecipeActivity extends AppCompatActivity
             if (twoPainels) {
                 layoutId = R.id.recipe_detail_fragment;
                 onStepSelected(recipe.getSteps().get(0));
+                Fragment fragment = getSupportFragmentManager().findFragmentById(layoutId);
+                if (fragment != null) {
+                    fragmentManager.beginTransaction().remove(fragment).commit();
+                }
             }
             RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
             fragmentManager.beginTransaction()
@@ -65,17 +70,11 @@ public class RecipeActivity extends AppCompatActivity
         }
         fragmentManager.beginTransaction()
                 .replace(layoutId, stepDetailFragment, null)
-                .addToBackStack(null)
                 .commit();
     }
 
     @Override
     public void onBackPressed() {
-        if (twoPainels) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            return;
-        }
         super.onBackPressed();
     }
 }

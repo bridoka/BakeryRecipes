@@ -19,7 +19,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Step Detail" />
+            tools:text="@string/step_detail" />
 
         <View
             android:id="@+id/view"
@@ -49,6 +49,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/playerView"
-            tools:text="Step Detail Description" />
+            tools:text="@string/step_detail_description" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

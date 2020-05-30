@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="4dp"
-            android:text="Ingredients" />
+            android:text="@string/ingredients" />
 
         <View
             style="@style/view_title"
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
             android:paddingBottom="4dp"
-            android:text="Steps" />
+            android:text="@string/steps" />
 
         <View
             style="@style/view_title"
