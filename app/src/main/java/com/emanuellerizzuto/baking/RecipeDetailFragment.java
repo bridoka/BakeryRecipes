@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +30,8 @@ public class RecipeDetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
         Context context = getContext();
-
+        TextView title = view.findViewById(R.id.title_recipe);
+        title.setText(viewModel.getRecipe().getName());
         setupIngredientsRecyclerView(view,context);
         setupStepsRecyclerView(view, context);
         return view;

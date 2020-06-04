@@ -11,6 +11,14 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/title_recipe"
+            style="@style/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
             style="@style/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
