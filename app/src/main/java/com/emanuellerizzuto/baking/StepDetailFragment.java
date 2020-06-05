@@ -1,5 +1,6 @@
 package com.emanuellerizzuto.baking;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -46,15 +47,21 @@ public class StepDetailFragment extends Fragment
     private RecipeStepParcelable step;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
-
+    private final String PLAYER_POSITION = "player_position";
+    private final String PLAY_WHEN_READY = "play_when_ready";
+    private Long positionExoPlayer = null;
+    private boolean playWhenReady = true;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
         Context context = getContext();
+
         if (savedInstanceState != null && savedInstanceState.getBundle("bundle") != null) {
             Bundle bundle = savedInstanceState.getBundle("bundle");
             setStep((RecipeStepParcelable) bundle.getParcelable("step"));
+            positionExoPlayer = savedInstanceState.getLong(PLAYER_POSITION);
+            playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY, true);
         }
 
         int currentOrientation = getResources().getConfiguration().orientation;
@@ -73,14 +80,6 @@ public class StepDetailFragment extends Fragment
         }
 
         mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
-        String videoURL = step.getVideoURL();
-        if (videoURL.isEmpty()) {
-            mPlayerView.setVisibility(View.GONE);
-        } else {
-            mPlayerView.setVisibility(View.VISIBLE);
-            Uri uri = Uri.parse(videoURL);
-            initializePlayer(context, uri);
-        }
         return view;
     }
 
@@ -94,16 +93,49 @@ public class StepDetailFragment extends Fragment
         Bundle bundle = new Bundle();
         bundle.putParcelable("step", step);
         outState.putBundle("bundle", bundle);
+        if (mExoPlayer != null) {
+            outState.putLong(PLAYER_POSITION, mExoPlayer.getCurrentPosition());
+            outState.putBoolean(PLAY_WHEN_READY, mExoPlayer.getPlayWhenReady());
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onStart() {
+        if (Util.SDK_INT >= 24) {
+            initializePlayer();
+        }
         super.onStart();
     }
 
-    private void initializePlayer(Context context, Uri mediaUri) {
-        if (mExoPlayer == null) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        ActionBar actionBar = ((RecipeActivity) getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        //hideSystemUi();
+        if (Util.SDK_INT < 24 || mExoPlayer == null) {
+            initializePlayer();
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    private void initializePlayer() {
+        Context context = getContext();
+        String videoURL = step.getVideoURL();
+        Uri mediaUri = Uri.parse(videoURL);
+        if (mExoPlayer == null && !videoURL.isEmpty()) {
+            mPlayerView.setVisibility(View.VISIBLE);
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -112,13 +144,17 @@ public class StepDetailFragment extends Fragment
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
-
+            if (positionExoPlayer != null) {
+                mExoPlayer.seekTo(positionExoPlayer);
+            }
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(context, "baking");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     context, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(playWhenReady);
+        } else {
+            mPlayerView.setVisibility(View.GONE);
         }
     }
 
@@ -153,31 +189,32 @@ public class StepDetailFragment extends Fragment
     }
 
     @Override
-    public void onDestroyView() {
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-            mExoPlayer = null;
-        }
-        super.onDestroyView();
-    }
-
-    @Override
     public void onDestroy() {
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-            mExoPlayer = null;
-        }
         super.onDestroy();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        ActionBar actionBar = ((RecipeActivity) getActivity()).getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT < 24) {
+            this.clearExoPlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT >= 24) {
+            this.clearExoPlayer();
+        }
+    }
+
+    private void clearExoPlayer() {
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     @Override

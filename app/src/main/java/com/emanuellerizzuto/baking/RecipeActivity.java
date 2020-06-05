@@ -70,6 +70,7 @@ public class RecipeActivity extends AppCompatActivity
         }
         fragmentManager.beginTransaction()
                 .replace(layoutId, stepDetailFragment, null)
+                .addToBackStack(null)
                 .commit();
     }
 
