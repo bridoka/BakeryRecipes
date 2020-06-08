@@ -6,58 +6,50 @@ import com.emanuellerizzuto.baking.data.RecipeIngredientParcelable;
 import com.emanuellerizzuto.baking.data.RecipeParcelable;
 import com.emanuellerizzuto.baking.data.RecipeStepParcelable;
 import com.emanuellerizzuto.baking.data.RecipesParcelable;
+import com.emanuellerizzuto.baking.repository.model.Ingredient;
+import com.emanuellerizzuto.baking.repository.model.Recipe;
+import com.emanuellerizzuto.baking.repository.model.Step;
+import com.emanuellerizzuto.baking.repository.service.RecipesService;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecipesUtils {
     public static RecipesParcelable getRecipes() {
         ArrayList<RecipeParcelable> recipeList = new ArrayList<RecipeParcelable>();
-        try {
-            String response = NetworkUtils.getRecipes();
-            if (response == null) {
-                return null;
-            }
-            JSONArray jsonArray = new JSONArray(response);
 
-            for (int j = 0; j < jsonArray.length(); j++) {
+        RecipesService recipesService = new RecipesService();
+        ArrayList<Recipe> allRecipes = recipesService.getAllRecipes();
 
-                JSONObject recipe =  jsonArray.getJSONObject(j);
-                JSONArray ingredientsArray = recipe.getJSONArray("ingredients");
-                JSONArray stepsArray = recipe.getJSONArray("steps");
+        for (int j = 0; j < allRecipes.size(); j++) {
 
-                ArrayList<RecipeIngredientParcelable> recipeIngredientList = new ArrayList<RecipeIngredientParcelable>();
-                for (int i = 0; i < ingredientsArray.length(); i++) {
-                    JSONObject ingredientData = ingredientsArray.getJSONObject(i);
-                    int quantity = ingredientData.getInt("quantity");
-                    String measure = ingredientData.getString("measure");
-                    String ingredient = ingredientData.getString("ingredient");
-                    recipeIngredientList.add(new RecipeIngredientParcelable(quantity, measure, ingredient));
-                }
+            Recipe recipe = allRecipes.get(j);
+            List<Ingredient> ingredientsArray = recipe.getIngredients();
+            List<Step> stepsArray = recipe.getSteps();
 
-                ArrayList<RecipeStepParcelable> recipeStepList = new ArrayList<RecipeStepParcelable>();
-                for (int i = 0; i < stepsArray.length(); i++) {
-                    JSONObject stepData = stepsArray.getJSONObject(i);
-                    int id = stepData.getInt("id");
-                    String shortDescription = stepData.getString("shortDescription");
-                    String description = stepData.getString("description");
-                    String videoURL = stepData.getString("videoURL");
-                    String thumbnail = (stepData.has("thumbnail") && !stepData.isNull("thumbnail"))
-                            ? stepData.getString("thumbnail")
-                            : null;
-                    recipeStepList.add(new RecipeStepParcelable(id, shortDescription, description, videoURL, thumbnail));
-                }
-
-                int id = recipe.getInt("id");
-                String name = recipe.getString("name");
-                recipeList.add(new RecipeParcelable(id, name, recipeIngredientList, recipeStepList));
+            ArrayList<RecipeIngredientParcelable> recipeIngredientList = new ArrayList<RecipeIngredientParcelable>();
+            for (int i = 0; i < ingredientsArray.size(); i++) {
+                Ingredient ingredientData = ingredientsArray.get(i);
+                float quantity = ingredientData.getQuantity();
+                String measure = ingredientData.getMeasure();
+                String ingredient = ingredientData.getIngredient();
+                recipeIngredientList.add(new RecipeIngredientParcelable(quantity, measure, ingredient));
             }
 
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            ArrayList<RecipeStepParcelable> recipeStepList = new ArrayList<RecipeStepParcelable>();
+            for (int i = 0; i < stepsArray.size(); i++) {
+                Step stepData = stepsArray.get(i);
+                int id = stepData.getId();
+                String shortDescription = stepData.getShortDescription();
+                String description = stepData.getDescription();
+                String videoURL = stepData.getVideoURL();
+                String thumbnail = stepData.getThumbnailURL();
+                recipeStepList.add(new RecipeStepParcelable(id, shortDescription, description, videoURL, thumbnail));
+            }
+
+            int id = recipe.getId();
+            String name = recipe.getName();
+            recipeList.add(new RecipeParcelable(id, name, recipeIngredientList, recipeStepList));
         }
 
         return new RecipesParcelable(recipeList);

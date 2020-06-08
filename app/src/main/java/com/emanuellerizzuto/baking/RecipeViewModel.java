@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.emanuellerizzuto.baking.data.RecipeParcelable;
 import com.emanuellerizzuto.baking.data.RecipesParcelable;
+import com.emanuellerizzuto.baking.repository.model.Recipe;
 import com.emanuellerizzuto.baking.utilities.AppExecutors;
 
 public class RecipeViewModel extends ViewModel {

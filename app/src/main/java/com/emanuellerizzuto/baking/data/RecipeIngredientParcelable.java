@@ -5,25 +5,25 @@ import android.os.Parcelable;
 
 public class RecipeIngredientParcelable implements Parcelable
 {
-    private int quantity;
+    private float quantity;
     private String measure;
     private String ingredient;
 
-    public RecipeIngredientParcelable(int quantity, String measure, String ingredient) {
+    public RecipeIngredientParcelable(float quantity, String measure, String ingredient) {
         this.quantity = quantity;
         this.measure = measure;
         this.ingredient = ingredient;
     }
 
     protected RecipeIngredientParcelable(Parcel in) {
-        quantity = in.readInt();
+        quantity = in.readFloat();
         measure = in.readString();
         ingredient = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(quantity);
+        dest.writeFloat(quantity);
         dest.writeString(measure);
         dest.writeString(ingredient);
     }
@@ -45,7 +45,7 @@ public class RecipeIngredientParcelable implements Parcelable
         }
     };
 
-    public int getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 

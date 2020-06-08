@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.emanuellerizzuto.baking.data.RecipeParcelable;
+import com.emanuellerizzuto.baking.repository.service.RecipesService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         int container = R.id.container;
         setContentView(R.layout.activity_main);
         FragmentManager fragmentManager = getSupportFragmentManager();

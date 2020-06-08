@@ -51,12 +51,14 @@ public class StepDetailFragment extends Fragment
     private final String PLAY_WHEN_READY = "play_when_ready";
     private Long positionExoPlayer = null;
     private boolean playWhenReady = true;
+    private boolean twoPainels = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
         Context context = getContext();
-
+        twoPainels = getActivity().findViewById(R.id.two_painels) != null;
         if (savedInstanceState != null && savedInstanceState.getBundle("bundle") != null) {
             Bundle bundle = savedInstanceState.getBundle("bundle");
             setStep((RecipeStepParcelable) bundle.getParcelable("step"));
@@ -65,7 +67,7 @@ public class StepDetailFragment extends Fragment
         }
 
         int currentOrientation = getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE && twoPainels == false) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
             getActivity().getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -73,10 +75,13 @@ public class StepDetailFragment extends Fragment
         } else {
             ((AppCompatActivity) getActivity()).getSupportActionBar().show();
             TextView tv_step_short_description = view.findViewById(R.id.tv_step_short_description);
-            tv_step_short_description.setText(step.getShortDescription());
-
+            if (tv_step_short_description != null) {
+                tv_step_short_description.setText(step.getShortDescription());
+            }
             TextView tv_step_description = view.findViewById(R.id.tv_step_description);
-            tv_step_description.setText(step.getDescription());
+            if (tv_step_description != null) {
+                tv_step_description.setText(step.getDescription());
+            }
         }
 
         mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);

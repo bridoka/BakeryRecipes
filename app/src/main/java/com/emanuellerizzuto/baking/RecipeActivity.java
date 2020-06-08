@@ -25,11 +25,7 @@ public class RecipeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
         FragmentManager fragmentManager = getSupportFragmentManager();
-
-        int currentOrientation = getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            twoPainels = findViewById(R.id.two_painels) != null;
-        }
+        twoPainels = findViewById(R.id.two_painels) != null;
         if (savedInstanceState == null) {
             viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
             Intent intent = getIntent();
@@ -67,11 +63,15 @@ public class RecipeActivity extends AppCompatActivity
             if (fragment != null) {
                 fragmentManager.beginTransaction().remove(fragment).commit();
             }
+            fragmentManager.beginTransaction()
+                    .replace(layoutId, stepDetailFragment, null)
+                    .commit();
+        } else {
+            fragmentManager.beginTransaction()
+                    .replace(layoutId, stepDetailFragment, null)
+                    .addToBackStack(null)
+                    .commit();
         }
-        fragmentManager.beginTransaction()
-                .replace(layoutId, stepDetailFragment, null)
-                .addToBackStack(null)
-                .commit();
     }
 
     @Override
